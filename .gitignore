@@ -1,0 +1,18 @@
+# Jupyter Notebooks
+# Ignore the directory containing exploratory notebooks
+notebooks/
+
+# Also ignore notebook checkpoint files
+.ipynb_checkpoints/
+
+# Python
+# Ignore virtual environment directories
+.venv/
+venv/
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+
+# Ignore data files
+data/
