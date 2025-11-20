@@ -6,4 +6,5 @@ List of scripts for automating task
 - [Convert image(s) to PDF](python/img2pdf.py)
 - [Convert PDF to image(s)](python/pdf2img.py)
 - [Rename multiple files](python/rename_file.py)
-- [Translate PDF](python/translate_pdf.py)
+- [Translate PDF (WIP)](python/translate_pdf.py)
+- [Split PDF](python/split_pdf.py)
