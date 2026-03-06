@@ -3,6 +3,7 @@ List of scripts for automating task
 
 ### Python
 
+- [Convert html(s) to PDF](python/convert_html_to_pdf.py)
 - [Convert image(s) to PDF](python/img2pdf.py)
 - [Convert PDF to image(s)](python/pdf2img.py)
 - [Rename multiple files](python/rename_file.py)
