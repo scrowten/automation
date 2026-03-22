@@ -1,6 +1,7 @@
 import os
 import re
 import sys
+import hashlib
 import argparse
 import subprocess
 import yt_dlp
@@ -243,18 +244,33 @@ def download_segment(url, output_dir, start_sec, end_sec, label=None,
     return output_path
 
 
+def _temp_filename(url, audio_only):
+    """Generate a unique temp filename based on URL to avoid collisions."""
+    url_hash = hashlib.md5(url.encode()).hexdigest()[:8]
+    ext = 'm4a' if audio_only else 'mp4'
+    return f'_temp_{url_hash}.{ext}'
+
+
 def _download_and_cut(url, output_dir, output_path, start_sec, end_sec,
                       audio_only, verbose):
     """Fallback: download the full video, then extract segment with ffmpeg."""
-    temp_path = os.path.join(output_dir, '_temp_full_download.mp4')
+    temp_path = os.path.join(output_dir, _temp_filename(url, audio_only))
 
-    opts = {
-        'outtmpl': temp_path,
-        'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-        'merge_output_format': 'mp4',
-        'quiet': not verbose,
-        'no_warnings': not verbose,
-    }
+    if audio_only:
+        opts = {
+            'outtmpl': temp_path,
+            'format': 'bestaudio/best',
+            'quiet': not verbose,
+            'no_warnings': not verbose,
+        }
+    else:
+        opts = {
+            'outtmpl': temp_path,
+            'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+            'merge_output_format': 'mp4',
+            'quiet': not verbose,
+            'no_warnings': not verbose,
+        }
 
     if verbose:
         print("Downloading full video for segment extraction...")
@@ -311,15 +327,23 @@ def download_batch(url, output_dir, timestamps_file, audio_only=False, verbose=F
 
     # Download full video once, then extract all segments
     os.makedirs(output_dir, exist_ok=True)
-    temp_path = os.path.join(output_dir, '_temp_full_download.mp4')
+    temp_path = os.path.join(output_dir, _temp_filename(url, audio_only))
 
-    opts = {
-        'outtmpl': temp_path,
-        'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-        'merge_output_format': 'mp4',
-        'quiet': not verbose,
-        'no_warnings': not verbose,
-    }
+    if audio_only:
+        opts = {
+            'outtmpl': temp_path,
+            'format': 'bestaudio/best',
+            'quiet': not verbose,
+            'no_warnings': not verbose,
+        }
+    else:
+        opts = {
+            'outtmpl': temp_path,
+            'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+            'merge_output_format': 'mp4',
+            'quiet': not verbose,
+            'no_warnings': not verbose,
+        }
 
     if verbose:
         print("Downloading full video...")
