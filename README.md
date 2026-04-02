@@ -5,8 +5,9 @@ Collection of scripts for automating tasks.
 ## Prerequisites
 
 - Python 3.10+
-- pip packages: `pip install yt-dlp pymupdf`
+- pip packages: `pip install yt-dlp pymupdf playwright Pillow`
 - System dependencies: `ffmpeg` (required for YouTube Downloader segment extraction)
+- Playwright browser: `playwright install chromium` (required for `html2img.py` and `convert_html_to_pdf.py`)
 
 ## Scripts
 
@@ -14,12 +15,36 @@ Collection of scripts for automating tasks.
 
 | Script | Description |
 |--------|-------------|
+| [html2img.py](python/html2img.py) | Convert HTML file or URL to image (PNG, JPG, WEBP, BMP, TIFF) |
 | [convert_html_to_pdf.py](python/convert_html_to_pdf.py) | Convert HTML file(s) to PDF |
 | [img2pdf.py](python/img2pdf.py) | Convert image(s) to PDF |
 | [pdf2img.py](python/pdf2img.py) | Convert PDF to image(s) |
 | [split_pdf.py](python/split_pdf.py) | Split PDF into parts or extract page ranges |
 | [rename_file.py](python/rename_file.py) | Rename multiple files with pattern matching |
 | [translate_pdf.py](python/translate_pdf.py) | Translate PDF content (WIP) |
+
+#### HTML to Image
+
+Convert an HTML file or URL to an image using a headless Chromium browser.
+
+```bash
+# Basic screenshot
+python html2img.py page.html output.png
+
+# Transparent background (PNG/WEBP only)
+python html2img.py page.html output.png --no-background
+
+# Screenshot a URL
+python html2img.py https://example.com screenshot.png
+
+# Full page at retina resolution
+python html2img.py page.html output.png --full-page --scale 2.0
+
+# JPEG with quality control
+python html2img.py page.html output.jpg --quality 85
+```
+
+See [python/README.md](python/README.md) for the full option reference.
 
 ### Media Tools
 
