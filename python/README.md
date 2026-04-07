@@ -6,6 +6,74 @@ A collection of command-line utilities for common file automation tasks.
 
 ## Scripts
 
+### `eml_to_pdf.py` — EML to PDF
+
+Converts `.eml` email files to clean, readable PDF documents.
+
+> **Runs 100% locally — no data is sent to any server or cloud service. Your emails stay private on your machine.**
+
+Handles HTML and plain-text emails, inline images, attachments, encoded headers (RFC 2047), and batch directory conversion.
+
+**Requirements**
+```bash
+pip install weasyprint Jinja2
+
+# System libraries required by weasyprint:
+# Ubuntu/Debian:
+sudo apt install libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf-2.0-0
+# macOS:
+brew install pango
+# Fedora/RHEL:
+sudo dnf install pango gdk-pixbuf2
+```
+
+**Usage**
+```
+python eml_to_pdf.py <INPUT> [OUTPUT] [options]
+```
+
+| Argument | Description |
+|---|---|
+| `INPUT` | Path to an `.eml` file or a directory containing `.eml` files |
+| `OUTPUT` | Output PDF file or directory. Defaults to `<input>.pdf` for single files, or `<input>/converted/` for directories |
+| `--extract-attachments` | Save email attachments to a `<output_stem>_attachments/` directory alongside the PDF |
+| `--max-image-size MB` | Skip inline images larger than this (default: `5`). Replaced with a placeholder to avoid memory issues |
+| `--verbose` | Print per-file progress |
+
+**Examples**
+```bash
+# Convert a single EML file
+python eml_to_pdf.py message.eml
+
+# Convert with explicit output path
+python eml_to_pdf.py message.eml output.pdf
+
+# Batch convert a directory
+python eml_to_pdf.py ./emails/ ./pdfs/
+
+# Convert and extract attachments to disk
+python eml_to_pdf.py message.eml output.pdf --extract-attachments
+
+# Skip images larger than 10 MB
+python eml_to_pdf.py message.eml output.pdf --max-image-size 10
+
+# Verbose batch conversion
+python eml_to_pdf.py ./emails/ ./pdfs/ --verbose
+```
+
+**What gets included in the PDF**
+
+| Element | Handled |
+|---|---|
+| Headers (From, To, CC, Subject, Date) | Yes |
+| HTML body | Yes (preferred over plain text) |
+| Plain text body | Yes (fallback, rendered in `<pre>`) |
+| Inline images (`cid:` references) | Yes — embedded as base64 |
+| Attachments | Listed at end of PDF; optionally extracted with `--extract-attachments` |
+| RFC 2047 encoded headers (non-ASCII) | Yes |
+
+---
+
 ### `html2img.py` — HTML to Image
 
 Renders an HTML file or URL to an image using a headless Chromium browser (Playwright).
@@ -300,12 +368,21 @@ Translates the text content of a PDF document.
 ## Running Tests
 
 ```bash
-# Unit and CLI tests (no browser needed)
+# eml_to_pdf — unit tests only (no weasyprint needed)
+pytest test_eml_to_pdf.py -m "not integration"
+
+# eml_to_pdf — all tests including PDF rendering (requires weasyprint + Jinja2)
+pytest test_eml_to_pdf.py
+
+# eml_to_pdf — with coverage
+pytest test_eml_to_pdf.py -m "not integration" --cov=eml_to_pdf --cov-report=term-missing
+
+# html2img — unit and CLI tests (no browser needed)
 pytest test_html2img.py -m "not integration"
 
-# All tests including integration (requires Playwright Chromium)
+# html2img — all tests including integration (requires Playwright Chromium)
 pytest test_html2img.py
 
-# With coverage
+# html2img — with coverage
 pytest test_html2img.py -m "not integration" --cov=html2img --cov-report=term-missing
 ```
